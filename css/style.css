@@ -48,11 +48,11 @@ svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.6;stro
 .more svg.i{width:13px;height:13px;margin-left:2px;position:relative;top:1px}
 .lbl{font-size:10px;font-weight:600;letter-spacing:.24em;color:var(--gold)}
 .u-link{font-size:11px;letter-spacing:.06em;min-height:28px;display:inline-flex;align-items:center;line-height:1}
-.u-link svg.i{width:13px;height:13px;margin-left:2px;position:relative;top:-1px}
+.u-link svg.i{width:13px;height:13px;margin-left:2px;position:relative;top:1px}
 .empty{margin:0;padding:28px 0;text-align:center;font-size:13px;color:var(--sub)}
 
 /* 와인 히어로 카드 */
-.hero{background:linear-gradient(160deg,#5A1C1C,var(--wine-d));color:var(--on-wine);border-radius:var(--r);padding:22px 22px 20px;position:relative;overflow:hidden}
+.hero{background:linear-gradient(160deg,#5A1C1C,var(--wine-d));color:var(--on-wine);border-radius:var(--r);padding:16px 22px 30px;position:relative;overflow:hidden}
 .hero::before{content:"";position:absolute;inset:0;background-image:radial-gradient(rgba(233,217,184,.16) 1px,transparent 1.2px);background-size:14px 14px;-webkit-mask:linear-gradient(200deg,#000,transparent 70%);mask:linear-gradient(200deg,#000,transparent 70%);pointer-events:none}
 .hero>*{position:relative}
 .hero .lbl{color:var(--gold-s)}
@@ -119,11 +119,13 @@ svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.6;stro
 .filter-row{display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--line);margin-bottom:-16px}
 .seg{display:flex;gap:18px;flex:1;min-width:0;overflow-x:auto;scrollbar-width:none;margin-right:calc(-1 * var(--gutter));padding-right:var(--gutter)}
 .seg::-webkit-scrollbar{display:none}
-.seg button{flex:none;position:relative;height:44px;font-size:13px;color:var(--sub);white-space:nowrap;letter-spacing:.02em}
-.seg button em{font-style:normal;font-size:11px;margin-left:4px;color:var(--faint)}
-.seg button.on{color:var(--ink);font-weight:600}
-.seg button.on::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1.5px;background:var(--wine)}
-.seg button.on em{color:var(--wine)}
+.seg button{flex:none;position:relative;height:46px;display:inline-flex;align-items:center;gap:2px;font-size:13px;color:var(--sub);white-space:nowrap;letter-spacing:.02em;transition:color .2s}
+.seg button:hover{color:var(--ink)}
+.seg button em{font-style:normal;font-size:11px;min-width:18px;height:16px;line-height:16px;text-align:center;padding:0 5px;border-radius:999px;background:var(--cream);color:var(--faint);transition:background .2s,color .2s}
+.seg button.on{color:var(--wine-d);font-weight:700}
+.seg button.on::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;border-radius:3px 3px 0 0;background:var(--wine);animation:seg-in .25s ease-out}
+.seg button.on em{background:var(--wine);color:var(--on-wine)}
+@keyframes seg-in{from{transform:scaleX(.4);opacity:0}to{transform:scaleX(1);opacity:1}}
 
 .view-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:-4px 0 -18px}
 .todo-only{position:relative;display:inline-flex;align-items:center;gap:6px;min-height:40px;font-size:12px;color:var(--ink);cursor:pointer;white-space:nowrap}
