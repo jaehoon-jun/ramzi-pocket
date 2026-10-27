@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FAF7F5">
+<meta name="robots" content="noindex, nofollow">
+<title>람지의 여행수첩</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="home" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></symbol>
+  <symbol id="coins" viewBox="0 0 24 24"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/></symbol>
+  <symbol id="bag" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></symbol>
+  <symbol id="note" viewBox="0 0 24 24"><path d="M15.5 3H5a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2V8.5L15.5 3Z"/><path d="M15 3v6h6"/></symbol>
+  <symbol id="down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="copy" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></symbol>
+  <symbol id="check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="dl" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></symbol>
+  <symbol id="img" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.09-3.09a2 2 0 0 0-2.82 0L6 21"/></symbol>
+  <symbol id="pin" viewBox="0 0 24 24"><path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/></symbol>
+  <symbol id="up" viewBox="0 0 24 24"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></symbol>
+  <symbol id="x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+  <symbol id="eye-off" viewBox="0 0 24 24"><path d="M10.73 5.08a10.74 10.74 0 0 1 11.2 6.57 1 1 0 0 1 0 .7 10.75 10.75 0 0 1-1.44 2.49"/><path d="M14.08 14.16a3 3 0 0 1-4.24-4.24"/><path d="M17.48 17.5a10.75 10.75 0 0 1-15.42-5.15 1 1 0 0 1 0-.7 10.75 10.75 0 0 1 4.45-5.14"/><path d="m2 2 20 20"/></symbol>
+  <symbol id="eye" viewBox="0 0 24 24"><path d="M2.06 12.35a1 1 0 0 1 0-.7 10.75 10.75 0 0 1 19.88 0 1 1 0 0 1 0 .7 10.75 10.75 0 0 1-19.88 0"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="updown" viewBox="0 0 24 24"><path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></symbol>
+  <symbol id="grip" viewBox="0 0 24 24"><circle cx="9" cy="5" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="19" r="1"/></symbol>
+</svg>
+
+<div class="app" id="app">
+  <p class="loading" id="loading">불러오는 중…</p>
+
+  <!-- ================= 홈 ================= -->
+  <section class="screen" id="s-home" aria-label="홈">
+    <header class="head"><div class="eyebrow">RAMZI'S TRAVEL POCKET</div><h1 class="trip-h"></h1></header>
+    <div class="body">
+      <div class="hero">
+        <div class="h-row"><span class="lbl">EXCHANGE</span><button class="u-link" data-go="rate">환율 수정하기<svg class="i"><use href="#right"/></svg></button></div>
+        <div class="calc">
+          <label for="home-price"><small>현지 가격</small><input class="num" id="home-price" type="text" inputmode="decimal" placeholder="0" autocomplete="off"></label>
+          <span class="eq">=</span>
+          <div><small>원화</small><span class="res num"><b id="home-krw">0</b><span>원</span></span></div>
+        </div>
+      </div>
+
+      <section>
+        <div class="sec-h"><h2>아직 안 산 것<em class="num" id="home-todo-n">00</em></h2><button class="more" data-go="shop">전체보기<svg class="i"><use href="#right"/></svg></button></div>
+        <ul class="list" id="home-todo"></ul>
+      </section>
+
+      <section>
+        <div class="sec-h"><h2>메모</h2><button class="more" data-go="memo">전체보기<svg class="i"><use href="#right"/></svg></button></div>
+        <div class="memo-peek" id="home-memos"></div>
+      </section>
+    </div>
+  </section>
+
+  <!-- ================= 환율 ================= -->
+  <section class="screen" id="s-rate" aria-label="환율">
+    <header class="head"><div class="eyebrow">EXCHANGE</div><h1 class="trip-h"></h1></header>
+    <div class="body">
+      <section>
+        <div class="sec-h"><h2>환율 계산</h2><span class="sec-sub">소수점 이하 생략</span></div>
+        <div class="rc-group">
+          <label for="price"><small>현지 가격</small><input class="num" id="price" type="text" inputmode="decimal" placeholder="0" autocomplete="off"></label>
+          <span class="rc-x num" id="rc-x"></span>
+          <div class="rc-out"><small>원화</small><b class="num"><span id="rc-krw">0</span><span class="u">원</span></b></div>
+        </div>
+      </section>
+
+      <section>
+        <div class="sec-h"><h2>환산표</h2><span class="sec-sub">가까운 금액 강조</span></div>
+        <table class="rc-table num"><thead><tr><th>현지 가격</th><th>원화</th></tr></thead><tbody id="rc-tbl"></tbody></table>
+      </section>
+
+      <section>
+        <div class="sec-h"><h2>환율(고정값)</h2><span class="sec-sub">입력한 값으로 계산됨</span></div>
+        <div class="rc-fix num" id="rc-fix"><span>현지 1 =</span><input id="rate" type="text" inputmode="decimal" autocomplete="off" aria-label="환율(고정값)" aria-describedby="rate-msg"><button class="btn btn-wine" id="rate-save">저장</button></div>
+        <p class="rc-msg" id="rate-msg" aria-live="polite"></p>
+      </section>
+    </div>
+  </section>
+
+  <!-- ================= 쇼핑 ================= -->
+  <section class="screen" id="s-shop" aria-label="쇼핑">
+    <header class="head"><div class="eyebrow">SHOPPING LIST</div><h1 class="trip-h"></h1></header>
+    <div class="body">
+      <div class="filter-row"><div class="seg" role="tablist" aria-label="상점" id="store-tabs"></div></div>
+
+      <div class="view-row">
+        <label class="todo-only" for="todo-only"><input type="checkbox" id="todo-only"><span class="ck"><svg class="i"><use href="#check"/></svg></span>미구매만 보기</label>
+        <div class="price-opt">
+          <span>가격 표시</span>
+          <div class="mini-seg" role="radiogroup" aria-label="가격 표시" id="price-mode">
+            <button role="radio" data-mode="krw">원화</button>
+            <button role="radio" data-mode="loc">현지</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="receipts" id="receipts"></div>
+
+      <div class="sum-box hero num">
+        <div class="cnt"><small>구매</small><b id="sum-cnt">0 / 0개</b></div>
+        <div><small>구매한 금액 합계</small><b id="sum-paid">0원</b></div>
+        <div class="sv"><small>절약 금액 합계</small><b id="sum-saved">0원</b></div>
+      </div>
+
+      <button class="btn btn-line" id="btn-xlsx" style="width:100%"><svg class="i"><use href="#dl"/></svg>엑셀 내려받기</button>
+      <p class="foot-note">전체 목록을 .xlsx 파일로 저장해요 (사진 제외)</p>
+      <button class="to-top" aria-label="맨 위로 이동"><svg class="i"><use href="#up"/></svg></button>
+    </div>
+  </section>
+
+  <!-- ================= 메모 ================= -->
+  <section class="screen" id="s-memo" aria-label="메모">
+    <header class="head"><div class="eyebrow">MEMO</div><h1 class="trip-h"></h1></header>
+    <div class="body">
+      <div>
+        <div class="memo-tools">
+          <span class="memo-count">전체 메모 <b class="num" id="memo-n">0</b>장<span id="hidden-wrap"> · <button class="hidden-link" id="btn-hidden" aria-expanded="false" aria-controls="hidden-memos"><span class="u">숨긴 메모 <b class="num" id="hidden-n">0</b>장</span></button></span></span>
+          <button class="tool-btn" id="btn-reorder" aria-pressed="false"><svg class="i"><use href="#updown"/></svg><span>순서 변경</span></button>
+        </div>
+        <div class="hm-panel" id="hidden-memos" hidden>
+          <p class="hm-title">HIDDEN</p>
+          <ul class="hm-list" id="hidden-list"></ul>
+        </div>
+        <div class="board" id="board"></div>
+      </div>
+      <p class="board-hint">메모 내용은 data/memos.js 에서 고쳐요</p>
+    </div>
+  </section>
+</div>
+
+<nav class="tabbar" aria-label="주요 기능">
+  <div class="tabs">
+    <button class="tab" data-tab="home"><svg class="i"><use href="#home"/></svg>홈</button>
+    <button class="tab" data-tab="rate"><svg class="i"><use href="#coins"/></svg>환율</button>
+    <button class="tab" data-tab="shop"><svg class="i"><use href="#bag"/></svg>쇼핑</button>
+    <button class="tab" data-tab="memo"><svg class="i"><use href="#note"/></svg>메모</button>
+  </div>
+</nav>
+
+<div class="viewer" id="viewer" hidden role="dialog" aria-modal="true" aria-label="사진 크게 보기">
+  <img alt="">
+  <button aria-label="닫기"><svg class="i"><use href="#x"/></svg></button>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<!-- 데이터: 이 세 파일만 고치면 돼요 (더블클릭으로 열어도 읽히도록 .js 로 둠) -->
+<script src="data/trip.js"></script>
+<script src="data/shopping.js"></script>
+<script src="data/memos.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
