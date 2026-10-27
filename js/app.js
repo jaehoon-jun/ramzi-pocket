@@ -106,7 +106,7 @@
     $$('.trip-h').forEach(h => {
       h.innerHTML = `<span class="trip-name">${esc(trip.name)}</span><span class="trip-date num">${esc(date)}</span>`;
     });
-    document.title = `람지의 여행수첩 · ${trip.name}`;
+    document.title = 'Ramzi-Pocket';
   }
 
   /* ---------- 홈 ---------- */
@@ -320,7 +320,7 @@
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, '쇼핑리스트');
       const d = new Date();
-      XLSX.writeFile(wb, `람지의여행수첩_쇼핑리스트_${d.getFullYear()}${pad2(d.getMonth() + 1)}${pad2(d.getDate())}.xlsx`);
+      XLSX.writeFile(wb, `Ramzi-Pocket_쇼핑리스트_${d.getFullYear()}${pad2(d.getMonth() + 1)}${pad2(d.getDate())}.xlsx`);
     } catch (e) {
       toast('엑셀을 만들지 못했어요. 인터넷 연결을 확인해 주세요');
     } finally {
