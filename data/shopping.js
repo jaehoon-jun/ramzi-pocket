@@ -168,6 +168,15 @@ window.SHOPPING = [
     "photos": ["muji-boatneck-t.jpg"]
   },
   {
+    "id": "item-21",
+    "store": "무인양품",
+    "storeEn": "MUJI",
+    "name": "남자 맨투맨",
+    "localPrice": 1990,
+    "krPrice": null,
+    "photos": []
+  },
+  {
     "id": "item-13",
     "store": "돈키호테",
     "storeEn": "DON QUIJOTE",
