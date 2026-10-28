@@ -209,11 +209,12 @@ svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.6;stro
 
 .sum-box{display:grid;grid-template-columns:repeat(3,1fr)}
 .sum-box.hero{padding:0}
-.sum-box>div{padding:16px 14px;min-width:0}
+.sum-box>div{padding:16px;min-width:0}
 .sum-box>div+div{border-left:1px solid rgba(233,217,184,.22)}
 .sum-box small{display:block;font-size:11px;color:var(--on-wine-sub)}
-.sum-box b{font-size:18px;font-weight:300;white-space:nowrap}
+.sum-box b{font-size:20px;font-weight:300;white-space:nowrap}
 .sum-box .sv b{color:var(--gold-s)}
+.sum-box small em{font-style:normal;color:var(--gold-s)}
 .sum-box .cnt{grid-column:1/-1;border-bottom:1px solid rgba(233,217,184,.22);display:flex;justify-content:space-between;align-items:baseline}
 .sum-box .cnt+div{border-left:0}
 .sum-box .cnt b{font-size:15px;font-weight:500}
