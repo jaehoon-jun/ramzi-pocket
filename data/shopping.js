@@ -2,48 +2,12 @@
 // 맨 앞 "window.SHOPPING =" 과 맨 끝 ";" 은 그대로 두세요.
 window.SHOPPING = [
   {
-    "id": "item-01",
-    "store": "유니클로",
-    "storeEn": "UNIQLO",
-    "name": "Soft Lip T",
-    "color": "Black",
-    "size": "XS",
-    "code": "487553",
-    "localPrice": 1290,
-    "krPrice": 29900,
-    "photos": ["uniqlo-soft-lip-t.png"]
-  },
-  {
-    "id": "item-02",
-    "store": "유니클로",
-    "storeEn": "UNIQLO",
-    "name": "Soft Lip T",
-    "color": "Black",
-    "size": "S",
-    "code": "487553",
-    "localPrice": 1290,
-    "krPrice": 29900,
-    "photos": ["uniqlo-soft-lip-t.png"]
-  },
-  {
     "id": "item-03",
     "store": "유니클로",
     "storeEn": "UNIQLO",
     "name": "Soft Lip T",
     "color": "WHITE",
-    "size": "XS",
-    "code": "487553",
-    "localPrice": 1290,
-    "krPrice": 29900,
-    "photos": ["uniqlo-soft-lip-t.png"]
-  },
-  {
-    "id": "item-04",
-    "store": "유니클로",
-    "storeEn": "UNIQLO",
-    "name": "Soft Lip T",
-    "color": "CREAM",
-    "size": "XS",
+    "size": "S",
     "code": "487553",
     "localPrice": 1290,
     "krPrice": 29900,
@@ -61,6 +25,62 @@ window.SHOPPING = [
     "localPrice": 2990,
     "krPrice": 39900,
     "photos": ["uniqlo-washable-knit.png"]
+  },
+  {
+    "id": "item-22",
+    "store": "유니클로",
+    "storeEn": "UNIQLO",
+    "name": "Mini T-shirt long sleeve",
+    "color": "Beige",
+    "localPrice": 1990,
+    "krPrice": 12900,
+    "photos": []
+  },
+  {
+    "id": "item-13",
+    "store": "돈키호테",
+    "storeEn": "DON QUIJOTE",
+    "name": "모리나가 베이크 치즈 케이크",
+    "localPrice": null,
+    "krPrice": 12000,
+    "photos": ["donki-morinaga-bake.png"]
+  },
+  {
+    "id": "item-14",
+    "store": "돈키호테",
+    "storeEn": "DON QUIJOTE",
+    "name": "시세이도 아이래시 컬러(속눈썹 뷰러)",
+    "localPrice": null,
+    "krPrice": 18000,
+    "photos": ["donki-shiseido-curler.png"]
+  },
+  {
+    "id": "item-15",
+    "store": "돈키호테",
+    "storeEn": "DON QUIJOTE",
+    "name": "카베진 (소화제)",
+    "note": "약국 전용",
+    "localPrice": null,
+    "krPrice": null,
+    "photos": ["donki-cabagin.jpg"]
+  },
+  {
+    "id": "item-16",
+    "store": "돈키호테",
+    "storeEn": "DON QUIJOTE",
+    "name": "블로그 손톱깎이(그린벨)",
+    "localPrice": null,
+    "krPrice": 22000,
+    "photos": ["donki-green-bell-clipper.png"]
+  },
+  {
+    "id": "item-17",
+    "store": "돈키호테",
+    "storeEn": "DON QUIJOTE",
+    "name": "카이 손톱깎이",
+    "localPrice": null,
+    "krPrice": 20000,
+    "photos": ["donki-kai-clipper.png"]
   },
   {
     "id": "item-06",
@@ -175,52 +195,6 @@ window.SHOPPING = [
     "localPrice": 1990,
     "krPrice": null,
     "photos": []
-  },
-  {
-    "id": "item-13",
-    "store": "돈키호테",
-    "storeEn": "DON QUIJOTE",
-    "name": "모리나가 베이크 치즈 케이크",
-    "localPrice": null,
-    "krPrice": 12000,
-    "photos": ["donki-morinaga-bake.png"]
-  },
-  {
-    "id": "item-14",
-    "store": "돈키호테",
-    "storeEn": "DON QUIJOTE",
-    "name": "시세이도 아이래시 컬러(속눈썹 뷰러)",
-    "localPrice": null,
-    "krPrice": 18000,
-    "photos": ["donki-shiseido-curler.png"]
-  },
-  {
-    "id": "item-15",
-    "store": "돈키호테",
-    "storeEn": "DON QUIJOTE",
-    "name": "카베진 (소화제)",
-    "note": "약국 전용",
-    "localPrice": null,
-    "krPrice": null,
-    "photos": ["donki-cabagin.jpg"]
-  },
-  {
-    "id": "item-16",
-    "store": "돈키호테",
-    "storeEn": "DON QUIJOTE",
-    "name": "블로그 손톱깎이(그린벨)",
-    "localPrice": null,
-    "krPrice": 22000,
-    "photos": ["donki-green-bell-clipper.png"]
-  },
-  {
-    "id": "item-17",
-    "store": "돈키호테",
-    "storeEn": "DON QUIJOTE",
-    "name": "카이 손톱깎이",
-    "localPrice": null,
-    "krPrice": 20000,
-    "photos": ["donki-kai-clipper.png"]
   },
   {
     "id": "item-18",
