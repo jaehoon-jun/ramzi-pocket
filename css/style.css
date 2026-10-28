@@ -80,12 +80,12 @@ svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.6;stro
 
 /* 브랜드 카드: 여권 칸 + 방문 도장 */
 .brands{list-style:none;margin:14px 0 0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
-.brands li{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:0;min-height:92px;padding:12px 6px 28px;border:1px dashed var(--line-strong);border-radius:var(--r-sm);background:var(--surface);text-align:center;cursor:pointer;overflow:hidden;transition:border-color .2s}
+.brands li{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:0;min-height:92px;padding:12px 6px;border:1px dashed var(--line-strong);border-radius:var(--r-sm);background:var(--surface);text-align:center;cursor:pointer;overflow:hidden;transition:border-color .2s}
 .brands li:hover{border-color:var(--gold)}
 .brands small{max-width:100%;font-size:8px;font-weight:600;letter-spacing:.14em;color:var(--gold);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .brands b{max-width:100%;font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .brands em{position:absolute;left:50%;bottom:7px;transform:translateX(-50%);font-style:normal;font-size:9px;font-weight:700;letter-spacing:.04em;white-space:nowrap;padding:2px 5px;border:1.5px solid var(--wine);border-radius:3px;background:rgba(255,255,255,.72);color:var(--wine);animation:stamp .3s ease-out}
-.brands li.done{border-style:solid;border-color:var(--line);background:var(--cream)}
+.brands li.done{padding-bottom:28px;border-style:solid;border-color:var(--line);background:var(--cream)}
 .brands li.done small,.brands li.done b{opacity:.6}
 @keyframes stamp{from{opacity:0;transform:translateX(-50%) scale(1.6)}}
 
