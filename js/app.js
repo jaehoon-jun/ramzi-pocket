@@ -18,7 +18,6 @@
   };
   const MEMO_COLORS = ['lemon', 'mint', 'peach', 'lavender', 'sky'];
   // 상점 머리글자 동그라미 색 (상점이 나오는 순서대로 돌려 씀)
-  const STORE_TONES = [['--memo-peach', '--wine'], ['--gold-bg', '--gold-ink'], ['--memo-mint', '#3F5A44'], ['--memo-lavender', '#56466A'], ['--memo-sky', '#3E5A66']];
   // 컬러 이름 → 동그라미 색. 목록에 없는 이름은 동그라미 없이 글자만 표시
   const SWATCH = {
     black: '#1A1A1A', white: '#FFFFFF', cream: '#F1E8D6', ivory: '#F6F0E1', offwhite: '#F4F0E6', 'off white': '#F4F0E6', 'off-white': '#F4F0E6', beige: '#D9C7A7', gray: '#9B9B9B', grey: '#9B9B9B',
@@ -110,27 +109,20 @@
   }
 
   /* ---------- 홈 ---------- */
-  function storeTone(store) {
-    const stores = [...new Set(items.map(it => it.store))];
-    const [bg, fg] = STORE_TONES[Math.max(0, stores.indexOf(store)) % STORE_TONES.length];
-    const v = c => c.startsWith('--') ? `var(${c})` : c;
-    return `background:${v(bg)};color:${v(fg)}`;
-  }
-
   function renderHomeCalc() {
     const v = parseNum($('#home-price').value);
     $('#home-krw').textContent = Number.isNaN(v) ? '0' : krwText(v);
   }
 
-  function renderHomeTodo() {
-    const todo = items.filter(it => !isDone(it));
-    $('#home-todo-n').textContent = pad2(todo.length);
-    $('#home-todo').innerHTML = todo.length ? todo.slice(0, 3).map(it => {
-      const sub = [it.store, it.color, it.size].filter(Boolean).join(' · ');
-      return `<li data-go="shop"><span class="av" style="${storeTone(it.store)}">${esc(String(it.store).trim().charAt(0))}</span>` +
-        `<span class="tx"><b>${esc(it.name)}</b><small>${esc(sub)}</small></span>` +
-        `<span class="pr num">${toKrw(it.localPrice) == null ? '<span>가격 미정</span>' : krwText(it.localPrice) + '<span>원</span>'}</span></li>`;
-    }).join('') : '<li class="empty" data-go="shop" style="justify-content:center;border:0">살 건 다 샀어요</li>';
+  // 상품 하나라도 구매 체크했으면 그 브랜드는 방문 완료
+  function renderHomeBrands() {
+    const gs = groups();
+    $('#home-brand-n').textContent = pad2(gs.filter(g => !g.items.some(isDone)).length);
+    $('#home-brands').innerHTML = gs.map(g => {
+      const done = g.items.some(isDone);
+      return `<li class="${done ? 'done' : ''}" data-go="shop" data-store="${esc(g.store)}">` +
+        `<small>${esc(g.en || '·')}</small><b>${esc(g.store)}</b>${done ? '<em>방문 완료</em>' : ''}</li>`;
+    }).join('');
   }
 
   /* ---------- 환율 ---------- */
@@ -295,7 +287,7 @@
     ln.classList.toggle('done', on);
     $('.box', ln).setAttribute('aria-pressed', on);
     ln.classList.remove('pop'); void ln.offsetWidth; ln.classList.add('pop');
-    applyShop(); renderSums(); renderHomeTodo();
+    applyShop(); renderSums(); renderHomeBrands();
   }
 
   async function downloadXlsx() {
@@ -406,13 +398,14 @@
 
   /* ---------- 다시 그리기 ---------- */
   function renderAllPrices() {
-    renderHomeCalc(); renderHomeTodo(); renderRateCalc(); renderShop();
+    renderHomeCalc(); renderHomeBrands(); renderRateCalc(); renderShop();
   }
 
   /* ---------- 이벤트 ---------- */
   function bind() {
     document.addEventListener('click', e => {
       const go = e.target.closest('[data-tab],[data-go]');
+      if (go && go.dataset.store) { shopStore = go.dataset.store; renderShop(); }
       if (go) show(go.dataset.tab || go.dataset.go);
     });
     window.addEventListener('hashchange', () => show(location.hash.slice(1)));
