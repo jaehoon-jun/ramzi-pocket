@@ -266,12 +266,14 @@
   function renderSums() {
     const bought = items.filter(isDone);
     const paid = bought.reduce((s, it) => s + (toKrw(it.localPrice) || 0), 0);
+    const paidLoc = bought.reduce((s, it) => s + (Number(it.localPrice) || 0), 0);
     const save = bought.reduce((s, it) => {
       const k = toKrw(it.localPrice);
       return (it.krPrice == null || k == null) ? s : s + Math.max(0, it.krPrice - k);
     }, 0);
     $('#sum-cnt').textContent = `${bought.length} / ${items.length}개`;
-    $('#sum-paid').textContent = rate > 0 ? fmt(paid) + '원' : '-';
+    $('#sum-paid-loc').textContent = fmt(paidLoc);
+    $('#sum-paid').textContent =rate > 0 ? fmt(paid) + '원' : '-';
     $('#sum-saved').textContent = save > 0 ? `▼ ${fmt(save)}원` : '0원';
   }
 
