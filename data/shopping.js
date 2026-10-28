@@ -148,6 +148,17 @@ window.SHOPPING = [
     "photos": ["muji-leg-warmer.png"]
   },
   {
+    "id": "item-19",
+    "store": "무인양품",
+    "storeEn": "MUJI",
+    "name": "저지 보트넥 7부소매 티셔츠",
+    "color": "White",
+    "size": "S",
+    "localPrice": 990,
+    "krPrice": 12900,
+    "photos": ["muji-boatneck-t.jpg"]
+  },
+  {
     "id": "item-13",
     "store": "돈키호테",
     "storeEn": "DON QUIJOTE",
