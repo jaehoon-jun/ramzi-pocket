@@ -37,6 +37,17 @@ window.SHOPPING = [
     "photos": []
   },
   {
+    "id": "item-23",
+    "store": "유니클로",
+    "storeEn": "UNIQLO",
+    "name": "저지 배럴 레그 팬츠",
+    "color": "Black",
+    "size": "S",
+    "localPrice": 4990,
+    "krPrice": 49900,
+    "photos": []
+  },
+  {
     "id": "item-13",
     "store": "돈키호테",
     "storeEn": "DON QUIJOTE",
