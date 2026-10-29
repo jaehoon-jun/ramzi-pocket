@@ -226,10 +226,14 @@
       const sumKrw = g.items.reduce((s, it) => s + (toKrw(it.localPrice) || 0), 0);
       const sumLoc = g.items.reduce((s, it) => s + (Number(it.localPrice) || 0), 0);
       const anyLocal = g.items.some(hasLocal);
+      const krwSum = rate > 0 && anyLocal ? fmt(sumKrw) + '원' : '-';
+      const locSum = anyLocal ? fmt(sumLoc) : '-';
       return `<section class="paper r-group" data-store="${esc(g.store)}">` +
         `<header class="rh">${g.en ? `<small>${esc(g.en)}</small>` : ''}<h3>${esc(g.store)}</h3></header>` +
         g.items.map(lineHTML).join('') +
-        `<div class="rf num"><span>${g.items.length}개 소계</span><b><span class="p-krw">${rate > 0 && anyLocal ? fmt(sumKrw) + '원' : '-'}</span><span class="p-loc">${anyLocal ? fmt(sumLoc) : '-'}</span></b></div>` +
+        `<div class="rf num"><span>${g.items.length}개 소계</span><span class="rv">` +
+          `<b class="p-krw">${krwSum}</b><small class="p-krw">현지 ${locSum}</small>` +
+          `<b class="p-loc">${locSum}</b><small class="p-loc">원화 ${krwSum}</small></span></div>` +
         `</section>`;
     }).join('') + '<p class="r-empty" hidden>여기서 살 건 다 샀어요</p>';
     open.forEach(id => { const ln = $(`#receipts .ln[data-id="${CSS.escape(id)}"]`); if (ln) setOpen(ln, true); });

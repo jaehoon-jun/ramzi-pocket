@@ -155,6 +155,8 @@ svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.6;stro
 .rh h3{margin:2px 0 0;font-size:17px;font-weight:500}
 .rf{display:flex;justify-content:space-between;align-items:baseline;border-top:1px dashed var(--line-strong);margin-top:8px;padding-top:10px;font-size:11px;color:var(--sub);letter-spacing:.06em}
 .rf b{font-size:15px;font-weight:500;color:var(--ink);letter-spacing:0}
+.rf .rv{display:flex;flex-direction:column;align-items:flex-end;line-height:1.35}
+.rf .rv small{font-size:11px;color:var(--sub);letter-spacing:0;white-space:nowrap}
 .r-empty{margin:0;padding:40px 0;text-align:center;font-size:13px;color:var(--sub)}
 
 /* 상품 한 줄: [체크][이름·정보][가격] */
