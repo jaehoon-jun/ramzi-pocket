@@ -1,7 +1,9 @@
 'use strict';
 // 람지의 여행수첩
 // - 여행·상품·메모는 data/*.js 에서 읽어온다 (두 사람 폰에 똑같이 보임)
-// - 환율 고정값, 구매 체크, 가격 표시 방식, 메모 숨김·순서는 이 폰의 localStorage 에만 저장된다
+// - 쇼핑·메모는 여행마다 따로, 포즈 레퍼런스는 모든 여행 공통
+// - 환율 고정값, 구매 체크, 가격 표시 방식, 메모 숨김·순서, 고른 여행은 이 폰의 localStorage 에만 저장된다
+//   (환율·구매 체크·메모 숨김·순서는 여행마다 따로 저장)
 (() => {
   const KEY = 'ramziNote:v1:';
   const saved = {
@@ -34,19 +36,32 @@
   const pad2 = n => String(n).padStart(2, '0');
   const icon = (id, cls = '') => `<svg class="i${cls ? ' ' + cls : ''}"><use href="#${id}"/></svg>`;
 
-  let trip, items, memos;
+  let trips, trip, tripId, items, memos, refs;
   let rate = null;
   let purchased = saved.get('purchased', {});
   let priceMode = saved.get('priceMode', 'krw');
   let memoHidden = saved.get('memoHidden', []);
   let memoOrder = saved.get('memoOrder', null);
   let shopStore = 'all';
+  let refCat = 'all';
+  let refFav = saved.get('refFav', []); // 즐겨찾기한 사진 id (이 폰에만 저장)
+  const REF_CATS = ['커플', '솔로', '실내'];
 
   // 원화 = 현지 가격 × 고정값, 소수점 이하 버림 (부동소수 오차로 9114.9999… 처럼 되는 것 방지)
   const toKrw = local => (rate > 0 && Number.isFinite(local)) ? Math.floor(local * rate + 1e-9) : null;
   const krwText = local => { const v = toKrw(local); return v == null ? '-' : fmt(v); };
   const isDone = it => !!purchased[it.id];
   const hasLocal = it => typeof it.localPrice === 'number' && Number.isFinite(it.localPrice); // 현지 가격을 아직 모르면 null
+
+  // 여행별 저장값: "purchased@milan" 처럼 여행 id 를 붙여 저장.
+  // 여행이 하나뿐이던 시절의 값(이름에 @ 없음)은 첫 번째 여행(후쿠오카) 것으로 이어서 씀
+  const tripKey = k => k + '@' + tripId;
+  const tripGet = (k, fallback) => {
+    const v = saved.get(tripKey(k), undefined);
+    if (v !== undefined) return v;
+    return tripId === trips[0].id ? saved.get(k, fallback) : fallback;
+  };
+  const tripSet = (k, v) => saved.set(tripKey(k), v);
 
   /* ---------- 공통 ---------- */
   let toastTimer;
@@ -86,7 +101,7 @@
   }
 
   /* ---------- 탭 이동 ---------- */
-  const TABS = ['home', 'rate', 'shop', 'memo'];
+  const TABS = ['home', 'rate', 'shop', 'memo', 'ref'];
   function show(tab) {
     if (!TABS.includes(tab)) tab = 'home';
     $$('.screen').forEach(s => s.classList.toggle('on', s.id === 's-' + tab));
@@ -99,13 +114,61 @@
     window.scrollTo(0, 0);
   }
 
-  /* ---------- 헤더 ---------- */
+  /* ---------- 헤더 · 여행 선택 ---------- */
+  const tripDate = t => [t.start, t.end].filter(Boolean).join(' — ');
   function renderHeaders() {
-    const date = [trip.start, trip.end].filter(Boolean).join(' — ') + (trip.purpose ? ' · ' + trip.purpose : '');
+    const date = tripDate(trip) + (trip.purpose ? ' · ' + trip.purpose : '');
+    // 여행이 둘 이상이면 지역명을 눌러 다른 여행을 고를 수 있게
+    const name = trips.length > 1
+      ? `<button class="trip-pick" aria-haspopup="dialog" aria-label="${esc(trip.name)}, 다른 여행 선택"><span class="trip-name">${esc(trip.name)}</span>${icon('down')}</button>`
+      : `<span class="trip-name">${esc(trip.name)}</span>`;
     $$('.trip-h').forEach(h => {
-      h.innerHTML = `<span class="trip-name">${esc(trip.name)}</span><span class="trip-date num">${esc(date)}</span>`;
+      h.innerHTML = `${name}<span class="trip-date num">${esc(date)}</span>`;
     });
     document.title = 'Ramzi-Pocket';
+  }
+
+  let sheetOpener = null;
+  function openTripSheet(opener) {
+    sheetOpener = opener;
+    const latest = trips[trips.length - 1].id;
+    $('#trip-list').innerHTML = [...trips].reverse().map(t =>
+      `<li><button data-trip="${esc(t.id)}" aria-current="${t.id === tripId}">` +
+        `<span class="tl-txt"><b>${esc(t.name)}${t.id === latest ? '<em>최신</em>' : ''}</b><small class="num">${esc(tripDate(t) + (t.purpose ? ' · ' + t.purpose : ''))}</small></span>` +
+        `${icon('check', 'tl-ck')}</button></li>`).join('');
+    $('#trip-sheet').hidden = false;
+    $('#trip-list button[aria-current="true"]').focus();
+  }
+  function closeTripSheet() {
+    $('#trip-sheet').hidden = true;
+    if (sheetOpener && document.contains(sheetOpener)) sheetOpener.focus();
+    sheetOpener = null;
+  }
+
+  // 여행 바꾸기: 그 여행의 쇼핑·메모·환율·체크 상태를 불러와 전부 다시 그림
+  const listFor = src => {
+    if (Array.isArray(src)) return tripId === trips[0].id ? src : []; // 예전 형식(배열 하나)은 첫 여행 것
+    return src && Array.isArray(src[tripId]) ? src[tripId] : [];
+  };
+  function loadTrip(id) {
+    trip = trips.find(t => t.id === id) || trips[trips.length - 1]; // 처음엔 가장 최근 여행
+    tripId = trip.id;
+    saved.set('trip', tripId);
+    items = listFor(window.SHOPPING);
+    memos = listFor(window.MEMOS);
+    purchased = tripGet('purchased', {});
+    memoHidden = tripGet('memoHidden', []);
+    memoOrder = tripGet('memoOrder', null);
+    const r = tripGet('rate', null);
+    rate = r && r.value > 0 ? Number(r.value) : (Number(trip.defaultRate) > 0 ? Number(trip.defaultRate) : null);
+    $('#rate').value = rate > 0 ? String(rate) : '';
+    $('#price').value = ''; $('#home-price').value = '';
+    shopStore = 'all';
+    if (sortable) setReorder(false);
+    renderHeaders();
+    syncRateInput();
+    renderAllPrices();
+    renderMemos();
   }
 
   /* ---------- 홈 ---------- */
@@ -118,6 +181,7 @@
   function renderHomeBrands() {
     const gs = groups();
     $('#home-brand-n').textContent = pad2(gs.filter(g => !g.items.some(isDone)).length);
+    if (!gs.length) { $('#home-brands').innerHTML = '<li class="empty" style="grid-column:1/-1;cursor:default">아직 쇼핑 목록이 없어요</li>'; return; }
     $('#home-brands').innerHTML = gs.map(g => {
       const done = g.items.some(isDone);
       return `<li class="${done ? 'done' : ''}" data-go="shop" data-store="${esc(g.store)}">` +
@@ -131,8 +195,9 @@
     const v = parseNum($('#price').value);
     $('#rc-krw').textContent = Number.isNaN(v) ? '0' : krwText(v);
     $('#rc-x').textContent = rate > 0 ? '× ' + rate : '× -';
-    const near = Number.isNaN(v) ? null : STEPS.reduce((a, b) => Math.abs(b - v) < Math.abs(a - v) ? b : a);
-    $('#rc-tbl').innerHTML = STEPS.map(s =>
+    const steps = Array.isArray(trip.steps) && trip.steps.length ? trip.steps : STEPS;
+    const near = Number.isNaN(v) ? null : steps.reduce((a, b) => Math.abs(b - v) < Math.abs(a - v) ? b : a);
+    $('#rc-tbl').innerHTML = steps.map(s =>
       `<tr${s === near ? ' class="hl"' : ''}><td>${fmt(s)}</td><td>${krwText(s)}원</td></tr>`).join('');
   }
 
@@ -147,21 +212,37 @@
     $('#rate-msg').textContent = rate > 0 ? '' : '먼저 고정값을 저장해 주세요';
   }
 
-  function saveRate() {
+  // 입력칸 값이 올바른 환율이면 숫자, 아니면 null
+  const readRateInput = () => {
     const raw = $('#rate').value.trim();
     const v = parseFloat(raw.replace(/,/g, ''));
-    if (!raw || !/^[0-9.,]+$/.test(raw) || !(v > 0)) {
+    return raw && /^[0-9.,]+$/.test(raw) && v > 0 ? v : null;
+  };
+  function applyRate(v) {
+    rate = v;
+    tripSet('rate', { value: v, savedAt: new Date().toISOString() });
+    renderAllPrices(); // 홈 계산기·환산표·쇼핑 금액 모두 새 환율로
+  }
+
+  // 입력하는 즉시 반영 (저장 버튼을 안 눌러도 홈 계산기에 바로 적용)
+  function onRateInput() {
+    const v = readRateInput();
+    if (v != null && v !== rate) applyRate(v);
+    syncRateInput();
+  }
+
+  function saveRate() {
+    const v = readRateInput();
+    if (v == null) {
       $('#rc-fix').classList.add('err');
       const msg = $('#rate-msg');
       msg.classList.add('err');
       msg.textContent = '0보다 큰 숫자만 저장할 수 있어요 (예: 8.5)';
       return;
     }
-    rate = v;
-    saved.set('rate', { value: v, savedAt: new Date().toISOString() });
+    if (v !== rate) applyRate(v);
     $('#rate').value = String(v);
     syncRateInput();
-    renderAllPrices();
     toast('환율을 저장했어요');
   }
 
@@ -235,7 +316,7 @@
           `<b class="p-krw">${krwSum}</b><small class="p-krw">현지 ${locSum}</small>` +
           `<b class="p-loc">${locSum}</b><small class="p-loc">원화 ${krwSum}</small></span></div>` +
         `</section>`;
-    }).join('') + '<p class="r-empty" hidden>여기서 살 건 다 샀어요</p>';
+    }).join('') + (items.length ? '<p class="r-empty" hidden>여기서 살 건 다 샀어요</p>' : '<p class="empty">아직 쇼핑 목록이 없어요</p>');
     open.forEach(id => { const ln = $(`#receipts .ln[data-id="${CSS.escape(id)}"]`); if (ln) setOpen(ln, true); });
     applyShop();
     renderSums();
@@ -287,7 +368,7 @@
     const id = ln.dataset.id;
     const on = !purchased[id];
     if (on) purchased[id] = true; else delete purchased[id];
-    saved.set('purchased', purchased);
+    tripSet('purchased', purchased);
     ln.classList.toggle('done', on);
     $('.box', ln).setAttribute('aria-pressed', on);
     ln.classList.remove('pop'); void ln.offsetWidth; ln.classList.add('pop');
@@ -318,7 +399,7 @@
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, '쇼핑리스트');
       const d = new Date();
-      XLSX.writeFile(wb, `Ramzi-Pocket_쇼핑리스트_${d.getFullYear()}${pad2(d.getMonth() + 1)}${pad2(d.getDate())}.xlsx`);
+      XLSX.writeFile(wb, `Ramzi-Pocket_${trip.name}_쇼핑리스트_${d.getFullYear()}${pad2(d.getMonth() + 1)}${pad2(d.getDate())}.xlsx`);
     } catch (e) {
       toast('엑셀을 만들지 못했어요. 인터넷 연결을 확인해 주세요');
     } finally {
@@ -372,7 +453,7 @@
     const shown = $$('#board .page').map(p => p.dataset.id);
     const rest = orderedMemos().map(m => m.id).filter(id => !shown.includes(id));
     memoOrder = [...shown, ...rest];
-    saved.set('memoOrder', memoOrder);
+    tripSet('memoOrder', memoOrder);
     $('#home-memos').innerHTML = visibleMemos().slice(0, 2).map(m => pageHTML(m, true)).join('');
   }
 
@@ -391,14 +472,74 @@
     $('span', btn).textContent = on ? '변경 완료' : '순서 변경';
   }
 
-  /* ---------- 사진 크게 보기 ---------- */
-  function openViewer(src) {
-    const v = $('#viewer');
-    $('img', v).src = src;
-    v.hidden = false;
-    $('button', v).focus();
+  /* ---------- 포즈 레퍼런스 ---------- */
+  const isFav = r => refFav.includes(r.id);
+  const inCat = (r, c) => r.cats.includes(c);
+  // 분류 → 즐겨찾기만 보기 순으로 거르고, 즐겨찾기를 맨 위로 (그 안에서는 파일 순서 유지)
+  const shownRefs = () => {
+    let list = refCat === 'all' ? refs : refs.filter(r => inCat(r, refCat));
+    if ($('#fav-only').checked) list = list.filter(isFav);
+    return [...list.filter(isFav), ...list.filter(r => !isFav(r))];
+  };
+
+  function renderRefs() {
+    $('#ref-tabs').innerHTML = [{ key: 'all', label: '전체', n: refs.length }, ...REF_CATS.map(c => ({ key: c, label: c, n: refs.filter(r => inCat(r, c)).length }))]
+      .map(t => `<button role="tab" data-cat="${esc(t.key)}" aria-selected="${t.key === refCat}" class="${t.key === refCat ? 'on' : ''}">${esc(t.label)}<em class="num">${t.n}</em></button>`).join('');
+    $('#fav-n').textContent = refs.filter(isFav).length;
+    const list = shownRefs();
+    $('#album').innerHTML = list.length ? list.map((r, i) => {
+      const name = r.title || '포즈 사진 ' + (i + 1);
+      return `<div class="shot" data-id="${esc(r.id)}">` +
+        `<button class="shot-open" data-i="${i}" aria-label="${esc(name)} 크게 보기"><img src="${esc(photoUrl(r.photo))}" alt="" loading="lazy" decoding="async"></button>` +
+        (r.title ? `<span>${esc(r.title)}</span>` : '') +
+        `<button class="fav" aria-label="${esc(name)} 즐겨찾기" aria-pressed="${isFav(r)}">${icon('star')}</button></div>`;
+    }).join('')
+      : `<p class="empty">${$('#fav-only').checked ? '즐겨찾기한 사진이 없어요' : '아직 사진이 없어요'}</p>`;
   }
-  function closeViewer() { $('#viewer').hidden = true; $('#viewer img').removeAttribute('src'); }
+
+  function toggleFav(id) {
+    const on = !refFav.includes(id);
+    refFav = on ? [...refFav, id] : refFav.filter(x => x !== id);
+    saved.set('refFav', refFav);
+    renderRefs();
+    toast(on ? '즐겨찾기에 추가했어요' : '즐겨찾기를 해제했어요');
+    return on;
+  }
+
+  /* ---------- 사진 크게 보기 ---------- */
+  // gallery: 좌우로 넘겨 볼 레퍼런스 목록 (쇼핑 사진은 한 장씩만)
+  let gallery = null, galleryAt = 0;
+  function openViewer(src) {
+    gallery = null;
+    showViewer(src, '');
+    syncViewerFav();
+  }
+  function openGallery(list, i) {
+    gallery = list; galleryAt = i;
+    stepGallery(0);
+  }
+  function stepGallery(d) {
+    if (!gallery || !gallery.length) return;
+    galleryAt = (galleryAt + d + gallery.length) % gallery.length;
+    const r = gallery[galleryAt];
+    const cap = (r.title ? esc(r.title) : '') + (r.note ? `<small>${esc(r.note)}</small>` : '');
+    showViewer(photoUrl(r.photo), cap);
+    syncViewerFav();
+  }
+  function syncViewerFav() {
+    const b = $('#viewer .v-fav');
+    b.hidden = !gallery;
+    if (gallery) b.setAttribute('aria-pressed', isFav(gallery[galleryAt]));
+  }
+  function showViewer(src, capHTML) {
+    const v = $('#viewer'), multi = !!gallery && gallery.length > 1;
+    $('img', v).src = src;
+    $('.v-cap', v).innerHTML = capHTML;
+    $('.v-cap', v).hidden = !capHTML;
+    $$('.v-nav', v).forEach(b => { b.hidden = !multi; });
+    if (v.hidden) { v.hidden = false; $('.v-close', v).focus(); }
+  }
+  function closeViewer() { $('#viewer').hidden = true; $('#viewer img').removeAttribute('src'); gallery = null; }
 
   /* ---------- 다시 그리기 ---------- */
   function renderAllPrices() {
@@ -408,6 +549,8 @@
   /* ---------- 이벤트 ---------- */
   function bind() {
     document.addEventListener('click', e => {
+      const pick = e.target.closest('.trip-pick');
+      if (pick) return openTripSheet(pick);
       const go = e.target.closest('[data-tab],[data-go]');
       if (go && go.dataset.store) { shopStore = go.dataset.store; renderShop(); }
       if (go) show(go.dataset.tab || go.dataset.go);
@@ -416,7 +559,7 @@
 
     $('#home-price').addEventListener('input', renderHomeCalc);
     $('#price').addEventListener('input', renderRateCalc);
-    $('#rate').addEventListener('input', syncRateInput);
+    $('#rate').addEventListener('input', onRateInput);
     $('#rate').addEventListener('keydown', e => { if (e.key === 'Enter') saveRate(); });
     $('#rate-save').addEventListener('click', saveRate);
 
@@ -452,7 +595,7 @@
     $('#hidden-list').addEventListener('click', e => {
       const b = e.target.closest('.hm-show'); if (!b) return;
       memoHidden = memoHidden.filter(id => id !== b.dataset.id);
-      saved.set('memoHidden', memoHidden);
+      tripSet('memoHidden', memoHidden);
       renderMemos();
     });
     $('#board').addEventListener('click', async e => {
@@ -460,7 +603,7 @@
       const m = memos.find(x => x.id === b.closest('.page').dataset.id); if (!m) return;
       if (b.dataset.act === 'hide') {
         memoHidden = [...memoHidden, m.id];
-        saved.set('memoHidden', memoHidden);
+        tripSet('memoHidden', memoHidden);
         renderMemos();
         toast('메모를 숨겼어요');
       } else {
@@ -470,31 +613,86 @@
     });
     $('#btn-reorder').addEventListener('click', () => setReorder(!$('#board').classList.contains('editing')));
 
-    $('#viewer').addEventListener('click', closeViewer);
-    document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#viewer').hidden) closeViewer(); });
+    $('#trip-sheet').addEventListener('click', e => {
+      const b = e.target.closest('[data-trip]');
+      if (b) {
+        const changed = b.dataset.trip !== tripId;
+        closeTripSheet();
+        if (changed) { loadTrip(b.dataset.trip); window.scrollTo(0, 0); toast(`${trip.name} 여행으로 바꿨어요`); }
+        return;
+      }
+      if (!e.target.closest('.sheet-panel')) closeTripSheet(); // 바깥 어두운 곳 누르면 닫기
+    });
+
+    $('#ref-tabs').addEventListener('click', e => {
+      const b = e.target.closest('button'); if (!b) return;
+      refCat = b.dataset.cat;
+      renderRefs();
+    });
+    $('#fav-only').addEventListener('change', renderRefs);
+    $('#album').addEventListener('click', e => {
+      const f = e.target.closest('.fav');
+      if (f) {
+        const id = f.closest('.shot').dataset.id;
+        toggleFav(id);
+        const nb = $(`#album .shot[data-id="${CSS.escape(id)}"] .fav`); // 다시 그려진 별에 톡 효과
+        if (nb) nb.classList.add('pop');
+        return;
+      }
+      const b = e.target.closest('.shot-open'); if (b) openGallery(shownRefs(), Number(b.dataset.i));
+    });
+
+    $('#viewer').addEventListener('click', e => {
+      const fb = e.target.closest('.v-fav');
+      if (fb) {
+        // 넘겨 보던 순서는 그대로 두고 별만 바꿈 (뒤쪽 사진첩은 바로 다시 정렬)
+        fb.setAttribute('aria-pressed', toggleFav(gallery[galleryAt].id));
+        fb.classList.remove('pop'); void fb.offsetWidth; fb.classList.add('pop');
+        return;
+      }
+      const nav = e.target.closest('.v-nav');
+      if (nav) return stepGallery(nav.classList.contains('v-prev') ? -1 : 1);
+      if (gallery && e.target.closest('img')) return; // 레퍼런스는 사진을 눌러도 닫히지 않게 (넘기다 실수로 닫힘 방지)
+      closeViewer();
+    });
+    // 레퍼런스는 좌우로 밀어서 넘기기
+    let touchX = null;
+    $('#viewer').addEventListener('touchstart', e => { touchX = e.touches.length === 1 ? e.touches[0].clientX : null; }, { passive: true });
+    $('#viewer').addEventListener('touchend', e => {
+      if (touchX == null || !gallery) return;
+      const dx = e.changedTouches[0].clientX - touchX; touchX = null;
+      if (Math.abs(dx) > 50) stepGallery(dx < 0 ? 1 : -1);
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && !$('#trip-sheet').hidden) return closeTripSheet();
+      if ($('#viewer').hidden) return;
+      if (e.key === 'Escape') closeViewer();
+      else if (e.key === 'ArrowLeft') stepGallery(-1);
+      else if (e.key === 'ArrowRight') stepGallery(1);
+    });
   }
 
   /* ---------- 시작 ---------- */
-  // data/*.js 가 window.TRIP / SHOPPING / MEMOS 에 넣어 둔 값을 읽음.
+  // data/*.js 가 window.TRIPS / SHOPPING / MEMOS / REFS 에 넣어 둔 값을 읽음.
   // 파일에 쉼표·따옴표 실수가 있으면 그 파일 값이 비어서 아래 안내가 뜸
-  const missing = [['trip.js', window.TRIP], ['shopping.js', window.SHOPPING], ['memos.js', window.MEMOS]]
+  const missing = [['trip.js', window.TRIPS || window.TRIP], ['shopping.js', window.SHOPPING], ['memos.js', window.MEMOS], ['refs.js', window.REFS]]
     .filter(([, v]) => v == null).map(([f]) => 'data/' + f);
   if (missing.length) {
     $('#loading').outerHTML = `<div class="load-err"><b>데이터를 불러오지 못했어요</b>${esc(missing.join(', '))} 파일에<br>쉼표·따옴표·괄호가 빠지지 않았는지 확인해 주세요.</div>`;
     return;
   }
-  trip = window.TRIP || {};
-  items = Array.isArray(window.SHOPPING) ? window.SHOPPING : [];
-  memos = Array.isArray(window.MEMOS) ? window.MEMOS : [];
-  const r = saved.get('rate', null);
-  rate = r && r.value > 0 ? Number(r.value) : (Number(trip.defaultRate) > 0 ? Number(trip.defaultRate) : null);
-  $('#rate').value = rate > 0 ? String(rate) : '';
+  // 예전 trip.js(window.TRIP 하나)도 그대로 읽히게
+  trips = (Array.isArray(window.TRIPS) ? window.TRIPS : [{ id: 'trip', ...window.TRIP }])
+    .filter(t => t && t.id).map(t => ({ ...t, id: String(t.id) }));
+  if (!trips.length) trips = [{ id: 'trip', name: '' }];
+  // id 를 안 적은 사진은 파일 이름을 id 로 (즐겨찾기 저장용)
+  // category 는 "솔로" 하나 또는 ["커플", "실내"] 처럼 여러 개 → cats 배열로 통일
+  refs = (Array.isArray(window.REFS) ? window.REFS : []).filter(r => r && r.photo)
+    .map(r => ({ ...r, id: String(r.id || r.photo), cats: [].concat(r.category || []).map(String) }));
 
-  renderHeaders();
-  syncRateInput();
   setPriceMode(priceMode);
-  renderAllPrices();
-  renderMemos();
+  loadTrip(saved.get('trip', null));
+  renderRefs();
   bind();
   $('#loading').remove();
   show(location.hash.slice(1));

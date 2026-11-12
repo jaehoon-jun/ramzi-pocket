@@ -30,6 +30,9 @@
   <symbol id="eye-off" viewBox="0 0 24 24"><path d="M10.73 5.08a10.74 10.74 0 0 1 11.2 6.57 1 1 0 0 1 0 .7 10.75 10.75 0 0 1-1.44 2.49"/><path d="M14.08 14.16a3 3 0 0 1-4.24-4.24"/><path d="M17.48 17.5a10.75 10.75 0 0 1-15.42-5.15 1 1 0 0 1 0-.7 10.75 10.75 0 0 1 4.45-5.14"/><path d="m2 2 20 20"/></symbol>
   <symbol id="eye" viewBox="0 0 24 24"><path d="M2.06 12.35a1 1 0 0 1 0-.7 10.75 10.75 0 0 1 19.88 0 1 1 0 0 1 0 .7 10.75 10.75 0 0 1-19.88 0"/><circle cx="12" cy="12" r="3"/></symbol>
   <symbol id="updown" viewBox="0 0 24 24"><path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></symbol>
+  <symbol id="camera" viewBox="0 0 24 24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></symbol>
+  <symbol id="star" viewBox="0 0 24 24"><path d="M11.53 2.3a.53.53 0 0 1 .95 0l2.31 4.68a2.12 2.12 0 0 0 1.6 1.16l5.16.76a.53.53 0 0 1 .3.9l-3.74 3.64a2.12 2.12 0 0 0-.61 1.88l.88 5.14a.53.53 0 0 1-.77.56l-4.62-2.43a2.12 2.12 0 0 0-1.97 0L6.4 21.01a.53.53 0 0 1-.77-.56l.88-5.14a2.12 2.12 0 0 0-.61-1.88L2.16 9.8a.53.53 0 0 1 .3-.9l5.16-.76a2.12 2.12 0 0 0 1.6-1.16z"/></symbol>
+  <symbol id="left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
   <symbol id="grip" viewBox="0 0 24 24"><circle cx="9" cy="5" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="19" r="1"/></symbol>
 </svg>
 
@@ -137,6 +140,21 @@
       <p class="board-hint">메모 내용은 data/memos.js 에서 고쳐요</p>
     </div>
   </section>
+
+  <!-- ================= 레퍼런스(포즈 사진첩) ================= -->
+  <section class="screen" id="s-ref" aria-label="포즈 레퍼런스">
+    <header class="head"><div class="eyebrow">POSE REFERENCE</div><h1 class="trip-h"></h1></header>
+    <div class="body">
+      <div class="filter-row"><div class="seg" role="tablist" aria-label="포즈 분류" id="ref-tabs"></div></div>
+      <div class="view-row">
+        <label class="todo-only" for="fav-only"><input type="checkbox" id="fav-only"><span class="ck"><svg class="i"><use href="#check"/></svg></span>즐겨찾기만 보기</label>
+        <span class="fav-count">즐겨찾기 <b class="num" id="fav-n">0</b>장</span>
+      </div>
+      <div class="album" id="album"></div>
+      <p class="board-hint">사진은 images/ref 폴더에 넣고 data/refs.js 에 적어요</p>
+      <button class="to-top" aria-label="맨 위로 이동"><svg class="i"><use href="#up"/></svg></button>
+    </div>
+  </section>
 </div>
 
 <nav class="tabbar" aria-label="주요 기능">
@@ -145,19 +163,31 @@
     <button class="tab" data-tab="rate"><svg class="i"><use href="#coins"/></svg>환율</button>
     <button class="tab" data-tab="shop"><svg class="i"><use href="#bag"/></svg>쇼핑</button>
     <button class="tab" data-tab="memo"><svg class="i"><use href="#note"/></svg>메모</button>
+    <button class="tab" data-tab="ref"><svg class="i"><use href="#camera"/></svg>ref</button>
   </div>
 </nav>
 
 <div class="viewer" id="viewer" hidden role="dialog" aria-modal="true" aria-label="사진 크게 보기">
   <img alt="">
-  <button aria-label="닫기"><svg class="i"><use href="#x"/></svg></button>
+  <p class="v-cap" hidden></p>
+  <button class="v-nav v-prev" aria-label="이전 사진" hidden><svg class="i"><use href="#left"/></svg></button>
+  <button class="v-nav v-next" aria-label="다음 사진" hidden><svg class="i"><use href="#right"/></svg></button>
+  <button class="v-fav" aria-label="즐겨찾기" aria-pressed="false" hidden><svg class="i"><use href="#star"/></svg></button>
+  <button class="v-close" aria-label="닫기"><svg class="i"><use href="#x"/></svg></button>
+</div>
+<div class="sheet" id="trip-sheet" hidden role="dialog" aria-modal="true" aria-labelledby="trip-sheet-t">
+  <div class="sheet-panel">
+    <p class="sheet-title" id="trip-sheet-t">여행 선택</p>
+    <ul class="trip-list" id="trip-list"></ul>
+  </div>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<!-- 데이터: 이 세 파일만 고치면 돼요 (더블클릭으로 열어도 읽히도록 .js 로 둠) -->
+<!-- 데이터: 이 네 파일만 고치면 돼요 (더블클릭으로 열어도 읽히도록 .js 로 둠) -->
 <script src="data/trip.js"></script>
 <script src="data/shopping.js"></script>
 <script src="data/memos.js"></script>
+<script src="data/refs.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>
