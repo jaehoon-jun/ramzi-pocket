@@ -17,5 +17,59 @@ window.MEMOS = {
     }
   ],
   "milan": [
+    {
+      "id": "memo-08",
+      "title": "1. 몽클레르",
+      "body": "패딩 00 (또는 0), 상의 S (또는 XS)\n바막, 패딩가디건, 멋있는 로고의 겉옷",
+      "color": "lemon"
+    },
+    {
+      "id": "memo-09",
+      "title": "2. 프라다",
+      "body": "버킷햇",
+      "color": "mint"
+    },
+    {
+      "id": "memo-10",
+      "title": "3. 셀린느",
+      "body": "버킷햇, 얇은 갈색 벨트",
+      "color": "peach"
+    },
+    {
+      "id": "memo-11",
+      "title": "4. 버버리",
+      "body": "체크 셔츠블라우스, 원피스, 버킷햇",
+      "color": "lavender"
+    },
+    {
+      "id": "memo-12",
+      "title": "5. Claudie Pierlot",
+      "body": "P (또는 0, 34, 36)\n셋업, 이쁜 옷",
+      "color": "sky"
+    },
+    {
+      "id": "memo-13",
+      "title": "6. 라코스테",
+      "body": "S\n가디건, 테니스치마",
+      "color": "lemon"
+    },
+    {
+      "id": "memo-14",
+      "title": "7. 마쥬 (멀어용)",
+      "body": "0\n특이하지 않고 이쁜 옷, 보이면 가고 아님 말공",
+      "color": "mint"
+    },
+    {
+      "id": "memo-15",
+      "title": "8. 아디다스 (멀어용)",
+      "body": "북쪽 구석에 있음",
+      "color": "peach"
+    },
+    {
+      "id": "memo-16",
+      "title": "9. 뉴발란스 (멀어용)",
+      "body": "남쪽 구석에 있음\n셋업 트레이닝복",
+      "color": "lavender"
+    }
   ]
 };
